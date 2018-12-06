@@ -1,5 +1,33 @@
+# fastqcr 0.1.1
+
+## New features
+
+New functions added to read and plot a collection of samples together:  
+   
+- `qc_read_collection()` (@MahShaaban , [#4](https://github.com/kassambara/fastqcr/pull/4))
+- `qc_plot_collection()` (@MahShaaban , [#4](https://github.com/kassambara/fastqcr/pull/5))
+
+When possible, the data from multiple samples are overlayed on a single graph and otherwise on multiple facets (when there is more than one line in a one sample plot). As with plotting the single file modules, the function `qc_plot_collection()` dispatches on the appropriate class `qc_read_collection()` and calls the internals corresponding to the input of the argument modules.
+   
+   
+## Bug fixes
+   
+- Fix for readr 1.2.0 (@jimhester, [#7](https://github.com/kassambara/fastqcr/pull/7))
+
+
+## Minor changes
+  
+- New argument `fastqc.path` added to the function `fastqc()`.
+
+## Bug fixes
+
+
 # fastqcr 0.1.0
     
+    
+## Bug fixes
+   
+- Now, `qc_report()`  handles better relative paths to FastQC zipfiles ([@ACharbonneau, #1](https://github.com/kassambara/fastqcr/issues/1))
     
 ## New features
    

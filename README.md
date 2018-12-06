@@ -4,6 +4,7 @@
 
 <br/>
 
+
 fastqcr: Quality Control of Sequencing Data
 ===========================================
 
@@ -15,25 +16,33 @@ If you have hundreds of samples, you’re not going to open up each HTML page. Y
 
 The **fastqcr** R package provides helper functions to easily and automatically parse, aggregate and analyze FastQC reports for large numbers of samples.
 
-Additionally, the **fastqcr** package provides a convenient solution for building a multi-QC report and a one-sample FastQC report with the result interpretations.
+Additionally, the **fastqcr** package provides a convenient solution for building a multi-QC report and a one-sample FastQC report with the result interpretations. The online documentation is available at: <http://www.sthda.com/english/rpkgs/fastqcr/>.
 
-Examples of QC reports, generated automatically by the **fastqcr** R package, includes:
+Examples of QC reports, generated automatically by the **fastqcr** R package, include:
 
 -   [Multi-QC report for multiple samples](http://www.sthda.com/english/rpkgs/fastqcr/qc-reports/fastqcr-multi-qc-report.html)
 -   [One sample QC report (+ interpretation)](http://www.sthda.com/english/rpkgs/fastqcr/qc-reports/sample-qc-report-interpretation.html)
 -   [One sample QC report (no interpretation)](http://www.sthda.com/english/rpkgs/fastqcr/qc-reports/sample-qc-report-without-interpretation.html)
 
+![fastqcr logo](tools/fastqcr.png)
+
 Installation and loading
 ------------------------
 
-Install the latest version from [GitHub](https://github.com/kassambara/fastqcr):
+-   fastqcr can be installed from [CRAN](https://cran.r-project.org/package=fastqcr) as follow:
+
+``` r
+install.packages("fastqcr")
+```
+
+-   Or, install the latest version from [GitHub](https://github.com/kassambara/fastqcr):
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("kassambara/fastqcr")
 ```
 
-Load fastqcr:
+-   Load fastqcr:
 
 ``` r
 library("fastqcr")
@@ -179,11 +188,12 @@ library(fastqcr)
 # Demo QC dir
 qc.dir <- system.file("fastqc_results", package = "fastqcr")
 qc.dir
-# [1] ""
+# [1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library/fastqcr/fastqc_results"
    
 # List of files in the directory
 list.files(qc.dir)
-# character(0)
+# [1] "S1_fastqc.zip" "S2_fastqc.zip" "S3_fastqc.zip" "S4_fastqc.zip"
+# [5] "S5_fastqc.zip"
 ```
 
 The demo QC directory contains five zipped folders corresponding to the FastQC output for 5 samples.
@@ -197,18 +207,18 @@ qc
 
 The aggregated report looks like this:
 
-| sample | module                      | status | tot.seq  | seq.length |  pct.gc|  pct.dup|
-|:-------|:----------------------------|:-------|:---------|:-----------|-------:|--------:|
-| S1     | Per base sequence content   | FAIL   | 50299587 | 35-76      |      48|    17.24|
-| S5     | Per base sequence quality   | PASS   | 65011962 | 35-76      |      48|    18.15|
-| S3     | Adapter Content             | PASS   | 67255341 | 35-76      |      49|    22.14|
-| S1     | Sequence Duplication Levels | PASS   | 50299587 | 35-76      |      48|    17.24|
-| S1     | Basic Statistics            | PASS   | 50299587 | 35-76      |      48|    17.24|
-| S3     | Per base sequence quality   | PASS   | 67255341 | 35-76      |      49|    22.14|
-| S3     | Per tile sequence quality   | PASS   | 67255341 | 35-76      |      49|    22.14|
-| S2     | Per sequence quality scores | PASS   | 50299587 | 35-76      |      48|    15.70|
-| S4     | Per tile sequence quality   | PASS   | 67255341 | 35-76      |      49|    19.89|
-| S4     | Per sequence quality scores | PASS   | 67255341 | 35-76      |      49|    19.89|
+| sample | module                       | status | tot.seq  | seq.length |  pct.gc|  pct.dup|
+|:-------|:-----------------------------|:-------|:---------|:-----------|-------:|--------:|
+| S4     | Per sequence GC content      | FAIL   | 67255341 | 35-76      |      49|    19.89|
+| S2     | Sequence Length Distribution | WARN   | 50299587 | 35-76      |      48|    15.70|
+| S5     | Sequence Length Distribution | WARN   | 65011962 | 35-76      |      48|    18.15|
+| S3     | Per base N content           | PASS   | 67255341 | 35-76      |      49|    22.14|
+| S1     | Kmer Content                 | PASS   | 50299587 | 35-76      |      48|    17.24|
+| S2     | Basic Statistics             | PASS   | 50299587 | 35-76      |      48|    15.70|
+| S4     | Overrepresented sequences    | PASS   | 67255341 | 35-76      |      49|    19.89|
+| S3     | Per sequence GC content      | FAIL   | 67255341 | 35-76      |      49|    22.14|
+| S1     | Overrepresented sequences    | PASS   | 50299587 | 35-76      |      48|    17.24|
+| S3     | Basic Statistics             | PASS   | 67255341 | 35-76      |      49|    22.14|
 
 Column names:
 
@@ -333,15 +343,15 @@ Inspecting Problems
 
 Once you’ve got this aggregated data, it’s easy to figure out what (if anything) is wrong with your data.
 
-1.  **R functions**. You can inspect problems per either modules or samples using the following R functions:
+**1) R functions**. You can inspect problems per either modules or samples using the following R functions:
 
 -   **qc\_fails**(qc): Displays samples or modules that failed.
 -   **qc\_warns**(qc): Displays samples or modules that warned.
 -   **qc\_problems**(qc): Union of **qc\_fails**() and **qc\_warns**(). Display which samples or modules that failed or warned.
 
-1.  **Input data**: aggregated data from **qc\_aggregate**()
+**2) Input data**: aggregated data from **qc\_aggregate**()
 
-2.  **Output data**: Returns samples or FastQC modules with failures or warnings. By default, these functions return a compact output format. If you want a stretched format, specify the argument *compact = FALSE*.
+**3) Output data**: Returns samples or FastQC modules with failures or warnings. By default, these functions return a compact output format. If you want a stretched format, specify the argument *compact = FALSE*.
 
 The format and the interpretation of the outputs depend on the additional argument *element*, which value is one of c("sample", "module").
 
@@ -520,7 +530,7 @@ We'll build a multi-qc report for the following demo QC directory:
 # Demo QC Directory
 qc.dir <- system.file("fastqc_results", package = "fastqcr")
 qc.dir
-# [1] ""
+# [1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library/fastqcr/fastqc_results"
 ```
 
 ``` r
@@ -540,13 +550,13 @@ We'll build a report for the following demo QC file:
 ``` r
  qc.file <- system.file("fastqc_results", "S1_fastqc.zip", package = "fastqcr")
 qc.file
-# [1] ""
+# [1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library/fastqcr/fastqc_results/S1_fastqc.zip"
 ```
 
 -   **One-Sample QC report with plot interpretations**:
 
 ``` r
- qc_report(qc.file, result.file = "~/Desktop/result",
+ qc_report(qc.file, result.file = "one-sample-report-with-interpretation",
    interpret = TRUE)
 ```
 
@@ -557,16 +567,16 @@ An example of report is available at: <a href= "http://www.sthda.com/english/rpk
 -   **One-Sample QC report without plot interpretations**:
 
 ``` r
- qc_report(qc.file, result.file = "~/Desktop/result",
-   interpret = TRUE)
+ qc_report(qc.file, result.file = "one-sample-report",
+   interpret = FALSE)
 ```
 
 <p>
 An example of report is available at: <a href= "http://www.sthda.com/english/rpkgs/fastqcr/qc-reports/sample-qc-report-without-interpretation.html", target = "_blank"> One sample QC report without interpretation</a>
 </p>
 
-Plotting
---------
+Importing and Plotting a FastQC QC Report
+-----------------------------------------
 
 We'll visualize the output for sample 1:
 
@@ -574,7 +584,7 @@ We'll visualize the output for sample 1:
 # Demo file
 qc.file <- system.file("fastqc_results", "S1_fastqc.zip",  package = "fastqcr")
 qc.file
-# [1] ""
+# [1] "/Library/Frameworks/R.framework/Versions/3.3/Resources/library/fastqcr/fastqc_results/S1_fastqc.zip"
 ```
 
 We start by reading the output using the function **qc\_read**(), which returns a list of tibbles containing the data for specified modules:
