@@ -82,8 +82,10 @@ qc_aggregate <- function(qc.dir = ".", progressbar = TRUE)
     res.summary <- rbind(res.summary, .summary)
     if(progressbar) utils::setTxtProgressBar(pb, i)
   }
-  res.summary <- dplyr::select_(res.summary, "sample", "module", "status",
-                                "tot.seq", "seq.length", "pct.gc", "pct.dup")
+  res.summary <- dplyr::select(
+    res.summary, 
+    dplyr::all_of(c("sample", "module", "status","tot.seq", "seq.length", "pct.gc", "pct.dup"))
+    )
   res.summary$sample <-gsub(".fastq.gz|.fastq", "", res.summary$sample,
                             ignore.case = TRUE)
   
@@ -117,12 +119,12 @@ summary.qc_aggregate <- function(object, ...){
   failed <- qc_fails(object, element = "module") %>%
     select(module, sample) %>%
     dplyr::rename(failed = sample)
-  if(nrow(failed) >0) res <- left_join(res, failed, by = "module", fill = "---")
+  if(nrow(failed) >0) res <- left_join(res, failed, by = "module")
   # Add sample names that warn
   warned <- qc_warns(object, element = "module") %>%
     select(module, sample) %>%
     dplyr::rename(warned = sample)
-  if(nrow(warned) >0) res <- left_join(res, warned, by = "module", fill = "---")
+  if(nrow(warned) >0) res <- left_join(res, warned, by = "module")
   res
 }
 
